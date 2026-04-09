@@ -1,4 +1,4 @@
-name: PR Feedback Slack Workflow
+name: PR Feedback Slack Node Workflow
 
 on:
   pull_request:
@@ -21,16 +21,9 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '22'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build action code
-        run: npm run build
 
       - name: Send PR feedback Slack DMs
-        run: node dist/src/pr-feedback/action.js
+        run: node .github/scripts/pr-feedback-slack.js
         env:
           GITHUB_TOKEN: ${{ github.token }}
           USER_MAP_JSON: ${{ secrets.USER_MAP_JSON }}
