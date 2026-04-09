@@ -16,7 +16,7 @@ test('parses a valid GitHub-to-Slack mapping JSON object', () => {
 test('throws a clear error for malformed mapping JSON', () => {
   assert.throws(
     () => parseGitHubToSlackMap('{"author":"U123"'),
-    /GITHUB_TO_SLACK_JSON must be valid JSON/,
+    /USER_MAP_JSON must be valid JSON/,
   );
 });
 

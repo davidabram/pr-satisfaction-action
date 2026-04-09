@@ -28,10 +28,11 @@ test('formats a merged feedback request DM with required PR context', () => {
   const sectionText: string = sectionBlock?.text?.text ?? '';
   assert.match(sectionText, /\*PR #42:\* Improve retry handling/);
   assert.match(sectionText, /https:\/\/github\.com\/acme\/app\/pull\/42/);
+  assert.match(sectionText, /Remember PR #42/);
+  assert.match(sectionText, /copy\/paste the PR number or PR URL into the next step/);
   assert.match(sectionText, /Author: octocat/);
   assert.match(sectionText, /Closed: Jan 15, 2024/);
   assert.doesNotMatch(sectionText, /You participated in this pull request as:/);
-  assert.doesNotMatch(sectionText, /paste PR #42 or the PR URL into the reference field/);
   const actionsBlock = payload.blocks.find((b: any) => b.type === 'actions');
   assert.ok(actionsBlock);
   const button = (actionsBlock as any).elements?.[0];
@@ -108,7 +109,7 @@ test('sends one DM per mapped participant with a button-based zero-code payload'
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: '📋 *PR #100:* Ship feedback workflow\n🔗 <https://github.com/acme/app/pull/100|View PR>\n👤 Author: octocat\n📅 Closed: Mar 10, 2024',
+          text: '📋 *PR #100:* Ship feedback workflow\n🔗 <https://github.com/acme/app/pull/100|View PR>\n📝 Remember PR #100 — copy/paste the PR number or PR URL into the next step.\n👤 Author: octocat\n📅 Closed: Mar 10, 2024',
         },
       },
       {

@@ -11,3 +11,4 @@ result
 result-*
 .direnv/
 .envrc
+.env

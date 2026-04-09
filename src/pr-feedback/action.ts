@@ -40,7 +40,7 @@ export interface ActionLogger {
 export interface RunClosedPullRequestFeedbackInput {
   event: PullRequestClosedEvent;
   repositoryFullName: string;
-  githubToSlackJson: string;
+  userMapJson: string;
   workflowUrl: string;
   githubClient: GitHubApiClient;
   slackClient: SlackApiClient;
@@ -203,7 +203,7 @@ async function writeGitHubOutputs(
 export async function runClosedPullRequestFeedback({
   event,
   repositoryFullName,
-  githubToSlackJson,
+  userMapJson,
   workflowUrl,
   githubClient,
   slackClient,
@@ -238,7 +238,7 @@ export async function runClosedPullRequestFeedback({
     issueComments,
     reviewComments,
   });
-  const recipients = resolveSlackRecipients(participants, githubToSlackJson);
+  const recipients = resolveSlackRecipients(participants, userMapJson);
   const delivery = await sendFeedbackRequests(
     slackClient,
     recipients.mappedParticipants,
@@ -272,7 +272,7 @@ export async function runFromEnvironment({
   const eventPath = getRequiredEnv(env, 'GITHUB_EVENT_PATH');
   const slackBotToken = getRequiredEnv(env, 'SLACK_BOT_TOKEN');
   const workflowUrl = getRequiredEnv(env, 'SLACK_WORKFLOW_URL');
-  const githubToSlackJson = getRequiredEnv(env, 'GITHUB_TO_SLACK_JSON');
+  const userMapJson = getRequiredEnv(env, 'USER_MAP_JSON');
   const githubToken = getRequiredEnv(env, 'GITHUB_TOKEN');
   const event = JSON.parse(await readTextFile(eventPath, 'utf8')) as PullRequestClosedEvent;
   const repositoryFullName = env.GITHUB_REPOSITORY?.trim() || event.repository?.full_name?.trim();
@@ -284,7 +284,7 @@ export async function runFromEnvironment({
   const result = await runClosedPullRequestFeedback({
     event,
     repositoryFullName,
-    githubToSlackJson,
+    userMapJson,
     workflowUrl,
     githubClient: createGitHubApiClient(githubToken, fetchImpl),
     slackClient: createSlackApiClient(slackBotToken, fetchImpl),

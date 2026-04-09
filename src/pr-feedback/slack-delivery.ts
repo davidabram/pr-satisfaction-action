@@ -103,6 +103,7 @@ export function formatFeedbackRequestMessage(
   const contextLines: string[] = [
     `📋 *PR #${pullRequest.number}:* ${pullRequest.title}`,
     `🔗 <${pullRequest.url}|View PR>`,
+    `📝 Remember PR #${pullRequest.number} — copy/paste the PR number or PR URL into the next step.`,
   ];
 
   // Add author if available

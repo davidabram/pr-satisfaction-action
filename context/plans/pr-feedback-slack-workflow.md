@@ -67,7 +67,7 @@ Implement a GitHub Actions-based PR feedback trigger that runs whenever a pull r
   - Completed: 2026-04-09
   - Files changed: `src/pr-feedback/slack-mapping.ts`, `test/pr-feedback/slack-mapping.test.ts`
   - Evidence: `npm test` passed (11 tests), `npm run build` passed.
-  - Notes: Added strict `GITHUB_TO_SLACK_JSON` parsing/validation and a pure resolver that partitions mapped vs unmapped participants while producing a stable missing-user report payload.
+  - Notes: Added strict `USER_MAP_JSON` parsing/validation and a pure resolver that partitions mapped vs unmapped participants while producing a stable missing-user report payload.
 
 - [x] T04: `Implement Slack DM delivery for PR feedback requests` (status:done)
   - Task ID: T04

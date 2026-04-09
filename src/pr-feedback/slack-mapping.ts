@@ -31,11 +31,11 @@ export function parseGitHubToSlackMap(rawMapping: string): GitHubToSlackMap {
     parsed = JSON.parse(rawMapping);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown JSON parse error';
-    throw new Error(`GITHUB_TO_SLACK_JSON must be valid JSON: ${message}`);
+    throw new Error(`USER_MAP_JSON must be valid JSON: ${message}`);
   }
 
   if (!isRecord(parsed)) {
-    throw new Error('GITHUB_TO_SLACK_JSON must be a JSON object keyed by GitHub login');
+    throw new Error('USER_MAP_JSON must be a JSON object keyed by GitHub login');
   }
 
   const mapping: GitHubToSlackMap = {};
@@ -44,17 +44,17 @@ export function parseGitHubToSlackMap(rawMapping: string): GitHubToSlackMap {
     const login = rawLogin.trim();
 
     if (!login) {
-      throw new Error('GITHUB_TO_SLACK_JSON cannot contain empty GitHub login keys');
+      throw new Error('USER_MAP_JSON cannot contain empty GitHub login keys');
     }
 
     if (typeof rawSlackUserId !== 'string') {
-      throw new Error(`GITHUB_TO_SLACK_JSON entry for "${login}" must be a Slack user ID string`);
+      throw new Error(`USER_MAP_JSON entry for "${login}" must be a Slack user ID string`);
     }
 
     const slackUserId = rawSlackUserId.trim();
 
     if (!slackUserId) {
-      throw new Error(`GITHUB_TO_SLACK_JSON entry for "${login}" cannot be empty`);
+      throw new Error(`USER_MAP_JSON entry for "${login}" cannot be empty`);
     }
 
     mapping[login] = slackUserId;

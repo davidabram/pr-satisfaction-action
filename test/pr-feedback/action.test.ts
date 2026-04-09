@@ -22,7 +22,7 @@ test('runs the closed-PR workflow for a merged PR and reports mapped plus unmapp
       },
     },
     repositoryFullName: 'acme/app',
-    githubToSlackJson: '{"author":"U123","reviewer":"U456"}',
+    userMapJson: '{"author":"U123","reviewer":"U456"}',
     workflowUrl: 'https://slack.com/workflows/pr-feedback',
     githubClient: {
       async listReviews() {
@@ -78,7 +78,7 @@ test('runs the closed-PR workflow for a merged PR and reports mapped plus unmapp
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: '📋 *PR #42:* Improve webhook retries\n🔗 <https://github.com/acme/app/pull/42|View PR>\n👤 Author: author\n📅 Closed: Jan 15, 2024',
+          text: '📋 *PR #42:* Improve webhook retries\n🔗 <https://github.com/acme/app/pull/42|View PR>\n📝 Remember PR #42 — copy/paste the PR number or PR URL into the next step.\n👤 Author: author\n📅 Closed: Jan 15, 2024',
         },
       },
       {
@@ -118,7 +118,7 @@ test('runs the closed-without-merge workflow and continues after per-user Slack 
       },
     },
     repositoryFullName: 'acme/app',
-    githubToSlackJson: '{"author":"U123","reviewer":"U456"}',
+    userMapJson: '{"author":"U123","reviewer":"U456"}',
     workflowUrl: 'https://slack.com/workflows/pr-feedback',
     githubClient: {
       async listReviews() {
@@ -167,7 +167,7 @@ test('writes GitHub Action outputs from environment-driven execution', async () 
       GITHUB_EVENT_PATH: '/tmp/fake-event.json',
       GITHUB_REPOSITORY: 'acme/app',
       GITHUB_TOKEN: 'ghs_test',
-      GITHUB_TO_SLACK_JSON: '{"author":"U123"}',
+      USER_MAP_JSON: '{"author":"U123"}',
       SLACK_BOT_TOKEN: 'xoxb-test',
       SLACK_WORKFLOW_URL: 'https://slack.com/workflows/pr-feedback',
       GITHUB_OUTPUT: '/tmp/fake-output.txt',
