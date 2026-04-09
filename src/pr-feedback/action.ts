@@ -23,6 +23,7 @@ export interface PullRequestClosedEvent extends PullRequestClosedEventLike {
     html_url?: string | null;
     merged?: boolean | null;
     user?: GitHubUserLike | null;
+    closed_at?: string | null;
   } | null;
 }
 
@@ -111,6 +112,8 @@ function toPullRequestContext(event: PullRequestClosedEvent): PullRequestContext
     title,
     url,
     merged: event.pull_request?.merged === true,
+    author: event.pull_request?.user?.login?.trim() || undefined,
+    closedAt: event.pull_request?.closed_at?.trim() || undefined,
   };
 }
 

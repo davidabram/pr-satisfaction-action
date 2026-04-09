@@ -13,6 +13,4 @@ This repository defines a GitHub Actions + Slack workflow for collecting pull-re
 
 ## Canonical docs
 
-- Root contract: [`../plan.md`](../plan.md)
-- Slack operator guide: [`../slack.md`](../slack.md)
 - Feature context: [`pr-feedback/slack-workflow.md`](pr-feedback/slack-workflow.md)

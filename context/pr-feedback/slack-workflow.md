@@ -25,7 +25,8 @@ See also: [../overview.md](../overview.md), [../architecture.md](../architecture
 - Recipient resolution preserves participant order, returns mapped participants with `slackUserId`, and emits a missing-user report with mapped/unmapped counts plus ordered unmapped logins.
 - `src/pr-feedback/slack-delivery.ts` exports `formatFeedbackRequestMessage(...)`, `createSlackApiClient(...)`, and `sendFeedbackRequests(...)`.
 - Delivery opens or reuses a DM via `conversations.open`, posts the feedback request via `chat.postMessage`, and returns structured `sent` plus `failed` results per mapped participant.
-- The DM text includes PR number, title, URL, closure state, participant roles, the Slack workflow link, and instructions to paste the PR number or URL into the form reference field.
+- The DM uses a Slack blocks payload with: a header ("👋 PR Feedback Request"), a section containing PR context (number, title, URL, author, closed date), and an actions block with a "Give Feedback" button linking to the workflow URL.
+- The `SlackApiClient.postMessage` method accepts a `SlackMessagePayload` object with `text` (fallback) and `blocks` (rich content) fields.
 - `src/pr-feedback/action.ts` exports the GitHub client, the end-to-end closed-PR runner, and the environment-driven action entrypoint used by the workflow.
 - The action fetches PR reviews, issue comments, and review comments from GitHub, then logs participant/mapped/unmapped/sent/failed counts and writes the same summary to `GITHUB_OUTPUT` when available.
 - `.github/workflows/pr-feedback-slack.yml` runs on `pull_request.closed`, builds the repo, and executes `node dist/src/pr-feedback/action.js` with `GITHUB_TOKEN`, `GITHUB_TO_SLACK_JSON`, `SLACK_BOT_TOKEN`, and `SLACK_WORKFLOW_URL`.

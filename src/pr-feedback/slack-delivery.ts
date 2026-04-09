@@ -5,11 +5,18 @@ export interface PullRequestContext {
   title: string;
   url: string;
   merged: boolean;
+  author?: string;
+  closedAt?: string;
+}
+
+export interface SlackMessagePayload {
+  text: string;
+  blocks: unknown[];
 }
 
 export interface SlackApiClient {
   openDirectMessage(slackUserId: string): Promise<{ channelId: string }>;
-  postMessage(channelId: string, text: string): Promise<{ ts?: string }>;
+  postMessage(channelId: string, message: SlackMessagePayload): Promise<{ ts?: string }>;
 }
 
 export interface SlackDeliverySuccess {
@@ -68,24 +75,80 @@ async function callSlackApi<TResponse extends Record<string, unknown>>(
   return payload;
 }
 
+function formatDate(dateString: string | undefined): string {
+  if (!dateString) {
+    return '';
+  }
+
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  } catch {
+    return '';
+  }
+}
+
 export function formatFeedbackRequestMessage(
   participant: MappedParticipant,
   pullRequest: PullRequestContext,
   workflowUrl: string,
-): string {
-  const closureLabel = getClosureLabel(pullRequest.merged);
-  const roles = formatParticipantRoles(participant.roles);
+): SlackMessagePayload {
+  const headerText = `👋 PR Feedback Request - PR #${pullRequest.number}`;
 
-  return [
-    `PR #${pullRequest.number} was ${closureLabel}: ${pullRequest.title}`,
-    pullRequest.url,
-    '',
-    `You participated in this pull request as: ${roles}.`,
-    'Please share your experience using this Slack workflow:',
-    workflowUrl,
-    '',
-    `When the form opens, paste PR #${pullRequest.number} or the PR URL into the reference field.`,
-  ].join('\n');
+  // Build context lines with available data
+  const contextLines: string[] = [
+    `📋 *PR #${pullRequest.number}:* ${pullRequest.title}`,
+    `🔗 <${pullRequest.url}|View PR>`,
+  ];
+
+  // Add author if available
+  const author = pullRequest.author ?? '@author';
+  contextLines.push(`👤 Author: ${author}`);
+
+  // Add closed date if available
+  const closedDate = formatDate(pullRequest.closedAt);
+  if (closedDate) {
+    contextLines.push(`📅 Closed: ${closedDate}`);
+  }
+
+  return {
+    text: headerText,
+    blocks: [
+      {
+        type: 'header',
+        text: {
+          type: 'plain_text',
+          text: '👋 PR Feedback Request',
+        },
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: contextLines.join('\n'),
+        },
+      },
+      {
+        type: 'actions',
+        elements: [
+          {
+            type: 'button',
+            text: {
+              type: 'plain_text',
+              text: 'Give Feedback',
+              emoji: true,
+            },
+            url: workflowUrl,
+            style: 'primary',
+          },
+        ],
+      },
+    ],
+  };
 }
 
 export function createSlackApiClient(token: string, fetchImpl: FetchLike = fetch): SlackApiClient {
@@ -107,10 +170,10 @@ export function createSlackApiClient(token: string, fetchImpl: FetchLike = fetch
       return { channelId };
     },
 
-    async postMessage(channelId: string, text: string): Promise<{ ts?: string }> {
+    async postMessage(channelId: string, message: SlackMessagePayload): Promise<{ ts?: string }> {
       const payload = await callSlackApi<{ ts?: string }>(fetchImpl, token, 'chat.postMessage', {
         channel: channelId,
-        text,
+        ...message,
       });
 
       return { ts: payload.ts };
@@ -130,8 +193,8 @@ export async function sendFeedbackRequests(
   for (const recipient of recipients) {
     try {
       const { channelId } = await slackClient.openDirectMessage(recipient.slackUserId);
-      const text = formatFeedbackRequestMessage(recipient, pullRequest, workflowUrl);
-      const { ts } = await slackClient.postMessage(channelId, text);
+      const messagePayload = formatFeedbackRequestMessage(recipient, pullRequest, workflowUrl);
+      const { ts } = await slackClient.postMessage(channelId, messagePayload);
 
       sent.push({
         login: recipient.login,
